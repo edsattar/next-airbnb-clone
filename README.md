@@ -2,10 +2,10 @@
 
 ### Install Next.js
 
-
 ```sh
 npx create-next-app airbnb-clone
 ```
+
 ### Install dependencies
 
 #### react-icons
@@ -13,7 +13,6 @@ npx create-next-app airbnb-clone
 ```sh
 npm i react-icons
 ```
-
 
 ### Install Tailwind CSS
 
@@ -64,7 +63,7 @@ body,
 
 @layer utilities {
   .container {
-    @apply max-w-[2520px] mx-auto xl:px-20 md:px-10 sm:px-2 px-4
+    @apply max-w-[2520px] mx-auto xl:px-20 md:px-10 sm:px-2 px-4;
   }
 }
 ```
@@ -95,7 +94,7 @@ type Props = {
 export default function RootLayout({ children }: Props) {
   return (
     <html lang="en">
-      <body className={nunito.className}>{children}</body>
+      <body className={nunito.className}>Modal / Navbar /{children}</body>
     </html>
   );
 }
@@ -119,16 +118,16 @@ truncate `globals.css`
 `> ./app/components/navbar/Navbar.tsx`
 
 ```js
+"use client";
+
 export const Navbar = () => {
   return (
     <div className="fixed w-full bg-white-100 shadow-sm">
       <div className="py-4 border-b-2">
         {/* <Container> */}
         <div className="container">
-          <div className="flex flex-row items-center justify-between gap-3 md:gap-0">*
-            Logo/
-            Search/
-            UserMenu/
+          <div className="flex flex-row items-center justify-between gap-3 md:gap-0">
+            Logo / Search / UserMenu /
           </div>
         </div>
         {/* </Container> */}
@@ -187,23 +186,19 @@ export const Logo = () => {
 `> ./app/components/navbar/Search.tsx`
 
 ```js
-'use client'
-import { BiSearch } from 'react-icons/bi';
+"use client";
+import { BiSearch } from "react-icons/bi";
 
 export const Search = () => {
   return (
     <div className="border-[1px] w-full md:w-auto py-2 rounded-full shadow-sm hover:shadow-md transition cursor-pointer">
       <div className="flex flex-row items-center justify-between">
-        <div className="text-sm font-semibold px-6">
-          Anywhere
-        </div>
+        <div className="text-sm font-semibold px-6">Anywhere</div>
         <div className="hidden sm:block text-sm font-semibold px-6 border-x-[1px] flex-1 text-center">
           Any Week
         </div>
         <div className=" text-sm pl-6 pr-2 text-gray-600 flex flex-row items-center gap-3 ">
-          <div className="hidden sm:block">
-            Add Guest
-          </div>
+          <div className="hidden sm:block">Add Guest</div>
           <div className="p-2 bg-rose-500 rounded-full text-white">
             <BiSearch size={18} />
           </div>
@@ -211,26 +206,39 @@ export const Search = () => {
       </div>
     </div>
   );
-}
+};
 ```
 
 ### Create navbar component `UserMenu.tsx`
 
 `> ./app/components/navbar/UserMenu.tsx`
 
-```js
+```tsx
 "use client";
 
+import { useCallback, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
 
 export const UserMenu = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleOpen = useCallback(() => {
+    setIsOpen((value) => !value);
+  }, []);
+
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
-        <div className="hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
+        <div
+          onClick={() => {}}
+          className="hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer"
+        >
           Become a host
         </div>
-        <div className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition">
+        <div
+          onClick={toggleOpen}
+          className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition"
+        >
           <AiOutlineMenu />
           <div className="hidden md:block">Avatar/</div>
         </div>
@@ -264,6 +272,96 @@ export const Avatar = ({ src }: AvatarProps): JSX.Element => {
     />
   );
 };
+```
 
-``` 
+### Create component `MenuItems.tsx`
 
+`> ./app/components/navbar/MenuItems.tsx`
+
+```js
+"use client";
+interface MenuItemsProps {
+  onClick?: () => void;
+  label: string;
+}
+
+export const MenuItems = ({ onClick, label }: MenuItemsProps): JSX.Element => {
+  return (
+    <div
+      onClick={onClick}
+      className="px-4 py-3 hover:bg-neutral-100 transtion font-semibold"
+    >
+      {label}
+    </div>
+  );
+};
+```
+
+### update `UserMenu.tsx` to use `Avatar.tsx` and add dropdown menu
+
+`> ./app/components/navbar/UserMenu.tsx`
+
+```js
+...
+          <AiOutlineMenu />
+          <div className="hidden md:block">
+            <Avatar />
+          </div>
+        </div>
+      </div>
+      {isOpen && (
+        <div className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 top-12 right-0 bg-white overflow-hidden text-sm">
+          <>
+            <MenuItems onClick={() => {}} label="Login" />
+            <MenuItems onClick={() => {}} label="Sign up" />
+          </>
+        </div>
+      )}
+    </div>
+  );
+};
+
+```
+
+## BUG FIX: hydration error on refresh and clicking screen
+
+create `ClientOnly.tsx`
+
+`> ./app/components/ClientOnly.tsx`
+
+```js
+"use client";
+
+import React, { useState, useEffect } from "react";
+
+interface ClientOnlyProps {
+  children: React.ReactNode;
+}
+
+const ClientOnly = ({ children }: ClientOnlyProps): JSX.Element | null => {
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) return null;
+
+  return <>{children}</>;
+};
+
+export default ClientOnly;
+```
+
+and use it to wrap around components in layout
+
+`> ./app/components/Layout.tsx`
+
+```js
+...
+<ClientOnly>
+  Modal /
+  <Navbar />
+</ClientOnly>
+...
+```
