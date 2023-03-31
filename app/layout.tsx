@@ -2,7 +2,7 @@ import { Navbar } from "./components/navbar/Navbar";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import ClientOnly from "./components/ClientOnly";
-import { Modal } from "./components/modals/Modal";
+import Modal from "./components/modals/Modal";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -22,7 +22,7 @@ export default function RootLayout({ children }: Props) {
     <html lang="en">
       <body className={nunito.className}>
         <ClientOnly>
-          {/* <Modal /> */}
+          <Modal actionLabel="Submit" title="hello" isOpen />
           <Navbar />
         </ClientOnly>
         {children}
