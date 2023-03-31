@@ -1,38 +1,269 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Initial Setup
 
-## Getting Started
+### Install Next.js
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+```sh
+npx create-next-app airbnb-clone
+```
+### Install dependencies
+
+#### react-icons
+
+```sh
+npm i react-icons
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Install Tailwind CSS
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```sh
+npm i -D tailwindcss postcss autoprefixer
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+#### Create Tailwind Config File
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```sh
+npx tailwindcss init -p
+```
 
-## Learn More
+#### Configure Tailwind Config File
 
-To learn more about Next.js, take a look at the following resources:
+`> tailwind.config.js`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```js
+/** @type {import('tailwindcss').Config} */
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+module.exports = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+```
 
-## Deploy on Vercel
+#### Configure Global CSS
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`> globals.css`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+:root {
+  height: 100%;
+}
+
+@layer utilities {
+  .container {
+    @apply max-w-[2520px] mx-auto xl:px-20 md:px-10 sm:px-2 px-4
+  }
+}
+```
+
+#### Configure Layout
+
+Update metadata, add font Nunito, add `{nunito.className}` to body
+
+`> layout.tsx`
+
+```js
+import { Nunito } from "next/font/google";
+import "./globals.css";
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+});
+export const metadata = {
+  title: "Airbnb Clone",
+  description: "Airbnb clone created using Next.js",
+};
+
+type Props = {
+  children: React.ReactNode,
+};
+
+export default function RootLayout({ children }: Props) {
+  return (
+    <html lang="en">
+      <body className={nunito.className}>{children}</body>
+    </html>
+  );
+}
+```
+
+`> page.tsx`
+
+```js
+export default function Home() {
+  return <div className="text-rose-500 text-2xl">Hello Airbnb</div>;
+}
+```
+
+delete `page.module.css`
+truncate `globals.css`
+
+## Navbar
+
+### Create component `Navbar.tsx`
+
+`> ./app/components/navbar/Navbar.tsx`
+
+```js
+export const Navbar = () => {
+  return (
+    <div className="fixed w-full bg-white-100 shadow-sm">
+      <div className="py-4 border-b-2">
+        {/* <Container> */}
+        <div className="container">
+          <div className="flex flex-row items-center justify-between gap-3 md:gap-0">*
+            Logo/
+            Search/
+            UserMenu/
+          </div>
+        </div>
+        {/* </Container> */}
+      </div>
+    </div>
+  );
+};
+```
+
+### Create component `Container.tsx`
+
+`> ./app/components/Container.tsx`
+
+```js
+"use client";
+
+interface ContainerProps {
+  children: React.ReactNode;
+}
+
+export const Container = ({ children }: ContainerProps): JSX.Element => {
+  return (
+    <div className="max-w-[2520px] mx-auto xl:px-20 ms:px-10 sm:px-2 px-4">
+      {children}
+    </div>
+  );
+};
+```
+
+### Create navbar component `Logo.tsx`
+
+First get the airbnb_logo.png and put it in the public folder
+
+`> ./app/components/navbar/Logo.tsx`
+
+```js
+"use client";
+
+import Image from "next/image";
+
+export const Logo = () => {
+  return (
+    <Image
+      src="/airbnb_logo.png"
+      alt="Airbnb Logo"
+      width={100}
+      height={100}
+      className="hidden md:block cursor-pointer"
+    />
+  );
+};
+```
+
+### Create navbar component `Search.tsx`
+
+`> ./app/components/navbar/Search.tsx`
+
+```js
+'use client'
+import { BiSearch } from 'react-icons/bi';
+
+export const Search = () => {
+  return (
+    <div className="border-[1px] w-full md:w-auto py-2 rounded-full shadow-sm hover:shadow-md transition cursor-pointer">
+      <div className="flex flex-row items-center justify-between">
+        <div className="text-sm font-semibold px-6">
+          Anywhere
+        </div>
+        <div className="hidden sm:block text-sm font-semibold px-6 border-x-[1px] flex-1 text-center">
+          Any Week
+        </div>
+        <div className=" text-sm pl-6 pr-2 text-gray-600 flex flex-row items-center gap-3 ">
+          <div className="hidden sm:block">
+            Add Guest
+          </div>
+          <div className="p-2 bg-rose-500 rounded-full text-white">
+            <BiSearch size={18} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+### Create navbar component `UserMenu.tsx`
+
+`> ./app/components/navbar/UserMenu.tsx`
+
+```js
+"use client";
+
+import { AiOutlineMenu } from "react-icons/ai";
+
+export const UserMenu = () => {
+  return (
+    <div className="relative">
+      <div className="flex flex-row items-center gap-3">
+        <div className="hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
+          Become a host
+        </div>
+        <div className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition">
+          <AiOutlineMenu />
+          <div className="hidden md:block">Avatar/</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+create component `Avatar.tsx`
+
+`> ./app/components/Avatar.tsx`
+
+```js
+"use client";
+
+import Image from "next/image";
+
+interface AvatarProps {
+  src?: string | null | undefined;
+}
+
+export const Avatar = ({ src }: AvatarProps): JSX.Element => {
+  return (
+    <Image
+      className="rounded-full"
+      height="30"
+      width="30"
+      alt="Avatar"
+      src={src || "/placeholder.jpg"}
+    />
+  );
+};
+
+``` 
+
