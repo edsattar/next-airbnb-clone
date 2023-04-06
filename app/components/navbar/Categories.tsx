@@ -1,4 +1,3 @@
-"use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
 import { TbBeach, TbMountain, TbPool } from "react-icons/tb";
@@ -102,24 +101,14 @@ const Categories = () => {
   const params = useSearchParams();
   const category = params?.get("category");
   const pathname = usePathname();
-  const isMainPage = pathname === "/";
 
-  if (!isMainPage) {
+  if (pathname !== "/") {
     return null;
   }
 
   return (
     <Container>
-      <div
-        className="
-          pt-4
-          flex 
-          flex-row 
-          items-center 
-          justify-between
-          overflow-x-auto
-        "
-      >
+      <div className="pt-4 flex flex-row items-center justify-between overflow-x-auto">
         {categories.map((item) => (
           <CategoryBox
             key={item.label}
