@@ -1,3 +1,5 @@
+following [https://github.com/AntonioErdeljac/next13-airbnb-clone]
+
 ## Initial Setup
 
 ### Install Next.js
@@ -8,23 +10,18 @@ npx create-next-app airbnb-clone
 
 ### Install dependencies
 
-#### react-icons
+#### axios, react-hook-form, react-hot-toast, react-icons, zustand
 
 ```sh
-npm i react-icons
+npm i axios react-hook-form react-hot-toast react-icons zustand
 ```
-
-#### zustand
+#### tailwindcss, prisma
 
 ```sh
-npm i zustand
+npm i -D tailwindcss postcss autoprefixer prisma
 ```
 
-### Install Tailwind CSS
-
-```sh
-npm i -D tailwindcss postcss autoprefixer
-```
+### Configure Tailwind CSS
 
 #### Create Tailwind Config File
 
@@ -374,7 +371,7 @@ and use it to wrap around components in layout
 
 ## Modal
 
-create `Modal.tsx`
+### Create `Modal.tsx`
 
 `> ./app/components/Modal.tsx`
 
@@ -596,4 +593,459 @@ import Button from "./Button";
 #### Update `layout.tsx`
 
 ```js
+...
+<ClientOnly>
+  <Modal actionLabel="Submit" title="hello" isOpen />
+  <Navbar />
+</ClientOnly>
+...
+```
+
+## RegisterModal
+
+### Create `useRegisterModal.tsx`
+
+`> ./app/hooks/useRegisterModal.tsx`
+
+```js
+import { create } from "zustand";
+
+interface RegisterModalStore {
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+}
+
+const useRegisterModal =
+  create <
+  RegisterModalStore >
+  ((set) => ({
+    isOpen: false,
+    onOpen: () => set({ isOpen: true }),
+    onClose: () => set({ isOpen: false }),
+  }));
+
+export default useRegisterModal;
+```
+
+### Create `RegisterModal.tsx`
+
+`> ./app/components/RegisterModal.tsx`
+
+```js
+"use client";
+
+import axios from "axios";
+import { AiFillGithub } from "react-icons/ai";
+// import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
+import { useCallback, useState } from "react";
+import { toast } from "react-hot-toast";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+
+import useRegisterModal from "@/app/hooks/useRegisterModal";
+
+import Modal from "./Modal";
+import Button from "../Button";
+import Heading from "../Heading";
+import Input from "../inputs/Input";
+
+const RegisterModal = () => {
+  const registerModal = useRegisterModal();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm <
+  FieldValues >
+  {
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  };
+
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    setIsLoading(true);
+
+    axios
+      .post("/api/register", data)
+      .then(() => {
+        toast.success("Registered!");
+        registerModal.onClose();
+        // loginModal.onOpen();
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const bodyContent = (
+    <div className="flex flex-col gap-4">
+      <Heading title="Welcome to Airbnb" subtitle="Create an account!" />
+      <Input
+        id="email"
+        label="Email"
+        disabled={isLoading}
+        register={register}
+        errors={errors}
+        required
+      />
+      <Input
+        id="name"
+        label="Name"
+        disabled={isLoading}
+        register={register}
+        errors={errors}
+        required
+      />
+      <Input
+        id="password"
+        label="Password"
+        type="password"
+        disabled={isLoading}
+        register={register}
+        errors={errors}
+        required
+      />
+    </div>
+  );
+
+  return (
+    <Modal
+      disabled={isLoading}
+      isOpen={registerModal.isOpen}
+      title="Register"
+      actionLabel="Continue"
+      onClose={registerModal.onClose}
+      onSubmit={handleSubmit(onSubmit)}
+      body={bodyContent}
+      // footer={footerContent}
+    />
+  );
+};
+export default RegisterModal;
+```
+
+### Create `Heading.tsx`
+
+`> ./app/components/Heading.tsx`
+
+```js
+"use client";
+
+interface HeadingProps {
+  title: string;
+  subtitle?: string;
+  center?: boolean;
+}
+
+const Heading = ({ title, subtitle, center }: HeadingProps) => {
+  return (
+    <div className={center ? "text-center" : "text-start"}>
+      <div className="text-2xl font-bold">{title}</div>
+      <div className="font-light text-neutral-500 mt-2">{subtitle}</div>
+    </div>
+  );
+};
+
+export default Heading;
+```
+
+### Create `Input.tsx`
+
+`> ./app/components/inputs/Input.tsx`
+
+```js
+"use client";
+
+import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
+import { BiDollar } from "react-icons/bi";
+
+interface InputProps {
+  id: string;
+  label: string;
+  type?: string;
+  disabled?: boolean;
+  formatPrice?: boolean;
+  required?: boolean;
+  register: UseFormRegister<FieldValues>;
+  errors: FieldErrors;
+}
+
+const Input = ({
+  id,
+  label,
+  type = "text",
+  disabled,
+  formatPrice,
+  register,
+  required,
+  errors,
+}: InputProps) => {
+  return (
+    <div className="w-full relative">
+      {formatPrice && (
+        <BiDollar
+          size={24}
+          className="
+            text-neutral-700
+            absolute
+            top-5
+            left-2
+          "
+        />
+      )}
+      <input
+        id={id}
+        disabled={disabled}
+        {...register(id, { required })}
+        placeholder=" "
+        type={type}
+        className={`
+          peer
+          w-full
+          p-4
+          pt-6 
+          font-light 
+          bg-white 
+          border-2
+          rounded-md
+          outline-none
+          transition
+          disabled:opacity-70
+          disabled:cursor-not-allowed
+          ${formatPrice ? "pl-9" : "pl-4"}
+          ${
+            errors[id]
+              ? "border-rose-500 focus:border-rose-500"
+              : "border-neutral-300 focus:border-black"
+          }
+        `}
+      />
+      <label
+        className={`
+          absolute 
+          text-md
+          duration-150 
+          transform 
+          -translate-y-3 
+          top-5 
+          z-10 
+          origin-[0] 
+          peer-placeholder-shown:scale-100 
+          peer-placeholder-shown:translate-y-0 
+          peer-focus:scale-75
+          peer-focus:-translate-y-4
+          ${formatPrice ? "left-9" : "left-4"}
+          ${errors[id] ? "text-rose-500" : "text-zinc-400"}
+        `}
+      >
+        {label}
+      </label>
+    </div>
+  );
+};
+
+export default Input;
+```
+
+## Prisma
+### Configure Prisma
+
+  
+`> ./prisma/.env`
+```env
+DATABASE_URL="mongodb://localhost:<port>/<database>"
+```
+
+`> ./prisma/schema.prisma`
+```prisma
+// set the provider to mongodb
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// define the models
+model User {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String?       @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  favoriteIds    String[]      @db.ObjectId
+  
+  accounts       Account[]
+  listings       Listing[]
+  reservations   Reservation[]
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Listing {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String
+  imageSrc      String
+  createdAt     DateTime      @default(now())
+  category      String
+  roomCount     Int
+  bathroomCount Int
+  guestCount    Int
+  locationValue String
+  userId        String        @db.ObjectId
+  price         Int
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservations  Reservation[]
+}
+
+model Reservation {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  listingId  String   @db.ObjectId
+  startDate  DateTime
+  endDate    DateTime
+  totalPrice Int
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+```
+
+### Push Prisma Schema
+
+```sh
+npx prisma db push
+```
+
+### Install next-auth, next-auth/prisma-adapter, bcrypt
+
+```sh
+npm i next-auth @prisma/client @next-auth/prisma-adapter bcrypt
+npm i -D @types/bcrypt
+```
+
+### Create `prismadb.ts`
+
+`> ./app/libs/prismadb.ts`
+
+```js
+import { PrismaClient } from "@prisma/client";
+
+declare global {
+  var prisma: PrismaClient | undefined;
+}
+
+const client = globalThis.prisma || new PrismaClient()
+if (process.env.NODE_ENV !== "production") globalThis.prisma = client;
+
+export default client;
+```
+
+## Next-Auth
+
+### Create `next-auth.ts`
+
+`> ./app/pages/api/auth/[...nextauth].ts`
+
+```js
+import NextAuth, { AuthOptions } from "next-auth";
+import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import prisma from "@/app/libs/prismadb";
+import bcrypt from "bcrypt";
+
+export const authOptions: AuthOptions = {
+  // Configure one or more authentication providers
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_ID as string,
+      clientSecret: process.env.GITHUB_SECRET as string,
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID as string,
+      clientSecret: process.env.GOOGLE_SECRET as string,
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Invalid credentials");
+        }
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email,
+          },
+        });
+
+        if (!user || !user?.hashedPassword) {
+          throw new Error("Invalid credentials");
+        }
+
+        const isCorrectPassword = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
+        if (!isCorrectPassword) {
+          throw new Error("Invalid credentials");
+        }
+        return user;
+      },
+    }),
+  ],
+  pages: {
+    signIn: "/",
+  },
+  debug: process.env.NODE_ENV === "development",
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};
+
+export default NextAuth(authOptions);
+```
+
+### add `NEXTAUTH_SECRET` to `.env`
+
+`> .env`
+```env
+NEXTAUTH_SECRET="secret"
+```
+
+
 

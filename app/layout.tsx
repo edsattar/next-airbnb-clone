@@ -1,12 +1,14 @@
-import { Navbar } from "./components/navbar/Navbar";
-import { Nunito } from "next/font/google";
 import "./globals.css";
+import { Nunito } from "next/font/google";
+import Navbar from "./components/navbar/Navbar";
 import ClientOnly from "./components/ClientOnly";
-import Modal from "./components/modals/Modal";
+import LoginModal from "./components/modals/LoginModal";
+import RegisterModal from "./components/modals/RegisterModal";
+import ToasterProvider from "./components/providers/ToasterProvider";
+import getCurrentUser from "./actions/getCurrentUser";
 
 const nunito = Nunito({
   subsets: ["latin"],
-  variable: "--font-nunito",
 });
 export const metadata = {
   title: "Airbnb Clone",
@@ -17,13 +19,16 @@ type Props = {
   children: React.ReactNode;
 };
 
-export default function RootLayout({ children }: Props) {
+export default async function RootLayout({ children }: Props) {
+  const currentUser = await getCurrentUser();
   return (
     <html lang="en">
       <body className={nunito.className}>
         <ClientOnly>
-          <Modal actionLabel="Submit" title="hello" isOpen />
-          <Navbar />
+        <Navbar currentUser={currentUser}/>
+          <ToasterProvider />
+          <LoginModal />
+          <RegisterModal />
         </ClientOnly>
         {children}
       </body>

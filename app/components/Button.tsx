@@ -18,7 +18,7 @@ const Button = ({
   outline,
   small,
   icon: Icon,
-}: ButtonProps): JSX.Element => {
+}: ButtonProps) => {
   return (
     <button
       disabled={disabled}
