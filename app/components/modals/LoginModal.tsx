@@ -28,8 +28,8 @@ const LoginModal = () => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "a@a",
+      password: "12345",
     },
   });
 

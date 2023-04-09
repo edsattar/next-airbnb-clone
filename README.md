@@ -10,15 +10,15 @@ npx create-next-app airbnb-clone
 
 ### Install dependencies
 
-#### axios, react-hook-form, react-hot-toast, react-icons, zustand
+#### axios, react-hook-form, react-hot-toast, react-icons, react-leaflet, react-select, world-countries zustand
 
 ```sh
-npm i axios react-hook-form react-hot-toast react-icons zustand
+npm i axios react-hook-form react-hot-toast react-icons react-leaflet react-select world-countries zustand
 ```
-#### tailwindcss, prisma
+#### tailwindcss, prisma, 
 
 ```sh
-npm i -D tailwindcss postcss autoprefixer prisma
+npm i -D tailwindcss postcss autoprefixer prisma @types/leaflet
 ```
 
 ### Configure Tailwind CSS
@@ -1046,6 +1046,95 @@ export default NextAuth(authOptions);
 ```env
 NEXTAUTH_SECRET="secret"
 ```
+Long Gap withought updating the readme. I'll update it soon.
+
+## Rent Modal
+
+### Create `useRentModal.tsx`
+
+`> ./app/hooks/useRentModal.tsx`
+
+```tsx
+import { create } from "zustand";
+
+interface RentModalStore {
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+}
+
+const useRentModal = create<RentModalStore>((set) => ({
+  isOpen: false,
+  onOpen: () => set({ isOpen: true }),
+  onClose: () => set({ isOpen: false }),
+}));
+
+export default useRentModal;
+```
+
+### Create `RentModal.tsx`
+
+`> ./app/components/modals/RentModal.tsx`
+
+```tsx
+"use client";
+
+import useRentModal from "@/app/hooks/useRentModal";
+
+import Modal from "./Modal";
+
+
+const RentModal = () => {
+  const rentModal = useRentModal();
+
+
+  return (
+    <Modal
+      isOpen={rentModal.isOpen}
+      title="Rent"
+      actionLabel="Continue"
+      onClose={rentModal.onClose}
+      onSubmit={rentModal.onClose}
+    />
+  );
+};
+
+export default RentModal;
+```
+
+### add `<RentModal />` to `layout.tsx`
+
+```tsx
+...
+  <RentModal />
+  <LoginModal />
+  <RegisterModal />
+...
+```
+
+### add `rentModal` to `UserMenu.tsx`
+
+```tsx
+import useRentModal from "@/app/hooks/useRentModal";
+...
+  const rentModal = useRentModal();
+...
+  const onRent = useCallback(() => {
+    if (currentUser) {
+      rentModal.onOpen();
+    } else {
+      loginModal.onOpen();
+    }
+  }, [currentUser, loginModal, rentModal]);
+...
+  <MenuItem label="List your property" onClick={rentModal.onOpen} />
+...
+```
+
+
+
+
+
 
 
 
