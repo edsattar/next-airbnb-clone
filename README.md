@@ -10,15 +10,16 @@ npx create-next-app airbnb-clone
 
 ### Install dependencies
 
-#### axios, react-hook-form, react-hot-toast, react-icons, react-leaflet, react-select, world-countries zustand
+#### axios, date-fns, next-cloudinary, react-date-range, react-hook-form, react-hot-toast, react-icons, react-leaflet, react-select, world-countries zustand
 
 ```sh
-npm i axios react-hook-form react-hot-toast react-icons react-leaflet react-select world-countries zustand
+npm i axios date-fns next-cloudinary react-date-range react-hook-form react-hot-toast react-icons react-leaflet react-select world-countries zustand
 ```
-#### tailwindcss, prisma, 
+
+#### tailwindcss, prisma,
 
 ```sh
-npm i -D tailwindcss postcss autoprefixer prisma @types/leaflet
+npm i -D tailwindcss postcss autoprefixer prisma @types/leaflet @types/react-date-range
 ```
 
 ### Configure Tailwind CSS
@@ -857,15 +858,17 @@ export default Input;
 ```
 
 ## Prisma
+
 ### Configure Prisma
 
-  
 `> ./prisma/.env`
+
 ```env
 DATABASE_URL="mongodb://localhost:<port>/<database>"
 ```
 
 `> ./prisma/schema.prisma`
+
 ```prisma
 // set the provider to mongodb
 datasource db {
@@ -884,7 +887,7 @@ model User {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   favoriteIds    String[]      @db.ObjectId
-  
+
   accounts       Account[]
   listings       Listing[]
   reservations   Reservation[]
@@ -1043,9 +1046,11 @@ export default NextAuth(authOptions);
 ### add `NEXTAUTH_SECRET` to `.env`
 
 `> .env`
+
 ```env
 NEXTAUTH_SECRET="secret"
 ```
+
 Long Gap withought updating the readme. I'll update it soon.
 
 ## Rent Modal
@@ -1083,10 +1088,8 @@ import useRentModal from "@/app/hooks/useRentModal";
 
 import Modal from "./Modal";
 
-
 const RentModal = () => {
   const rentModal = useRentModal();
-
 
   return (
     <Modal
@@ -1131,10 +1134,6 @@ import useRentModal from "@/app/hooks/useRentModal";
 ...
 ```
 
+### create Map.jsx
 
-
-
-
-
-
-
+### add to RentModal.tsx

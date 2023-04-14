@@ -17,3 +17,5 @@ export const Avatar = ({ src }: AvatarProps) => {
     />
   );
 };
+
+export default Avatar;

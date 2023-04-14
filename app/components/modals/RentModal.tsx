@@ -16,8 +16,8 @@ import CountrySelect from "../inputs/CountrySelect";
 import { categories } from "../navbar/Categories";
 import ImageUpload from "../inputs/ImageUpload";
 import Input from "../inputs/Input";
-import Heading from "./Heading";
-
+import Heading from "../Heading";
+import { JsxElement } from "typescript";
 
 enum STEPS {
   CATEGORY = 0,
@@ -112,21 +112,16 @@ const RentModal = () => {
       });
   };
 
-  const actionLabel = useMemo(() => {
-    if (step === STEPS.PRICE) {
-      return "Create";
-    }
+  const actionLabel = useMemo(
+    () => (step === STEPS.PRICE ? "Create" : "Next"),
+    [step]
+  );
 
-    return "Next";
-  }, [step]);
+  const secondaryActionLabel = useMemo(
+    () => (step === STEPS.CATEGORY ? undefined : "Back"),
+    [step]
+  );
 
-  const secondaryActionLabel = useMemo(() => {
-    if (step === STEPS.CATEGORY) {
-      return undefined;
-    }
-
-    return "Back";
-  }, [step]);
 
   let bodyContent = (
     <div className="flex flex-col gap-8">
@@ -148,7 +143,6 @@ const RentModal = () => {
       </div>
     </div>
   );
-
   if (step === STEPS.LOCATION) {
     bodyContent = (
       <div className="flex flex-col gap-8">
@@ -164,13 +158,10 @@ const RentModal = () => {
       </div>
     );
   }
-
   if (step === STEPS.INFO) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="Share some basics about your place"
-        />
+        <Heading title="Share some basics about your place" />
         <Counter
           onChange={(value) => setCustomValue("guestCount", value)}
           value={guestCount}
@@ -194,7 +185,6 @@ const RentModal = () => {
       </div>
     );
   }
-
   if (step === STEPS.IMAGES) {
     bodyContent = (
       <div className="flex flex-col gap-8">
@@ -209,7 +199,6 @@ const RentModal = () => {
       </div>
     );
   }
-
   if (step === STEPS.DESCRIPTION) {
     bodyContent = (
       <div className="flex flex-col gap-8">
@@ -237,7 +226,6 @@ const RentModal = () => {
       </div>
     );
   }
-
   if (step === STEPS.PRICE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
@@ -258,7 +246,6 @@ const RentModal = () => {
       </div>
     );
   }
-
   return (
     <Modal
       disabled={isLoading}

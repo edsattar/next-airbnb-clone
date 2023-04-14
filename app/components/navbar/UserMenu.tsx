@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
-import { Avatar } from "../Avatar";
+import Avatar from "../Avatar";
 import { MenuItem } from "./MenuItem";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
@@ -15,7 +15,7 @@ interface UserMenuProps {
   currentUser?: SafeUser | null;
 }
 
-export const UserMenu = ({ currentUser }: UserMenuProps) => {
+const UserMenu = ({ currentUser }: UserMenuProps) => {
   const router = useRouter();
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
@@ -90,3 +90,5 @@ export const UserMenu = ({ currentUser }: UserMenuProps) => {
     </div>
   );
 };
+
+export default UserMenu;

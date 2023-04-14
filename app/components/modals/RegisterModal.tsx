@@ -14,7 +14,7 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 
 import Modal from "./Modal";
 import Button from "../Button";
-import Heading from "./Heading";
+import Heading from "../Heading";
 import Input from "../inputs/Input";
 import { signIn } from "next-auth/react";
 
@@ -45,7 +45,7 @@ const RegisterModal = () => {
       .then(() => {
         toast.success("Registered!");
         registerModal.onClose();
-        // loginModal.onOpen();
+        loginModal.onOpen();
       })
       .catch((error) => {
         toast.error(error.message);

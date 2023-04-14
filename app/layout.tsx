@@ -26,13 +26,13 @@ export default async function RootLayout({ children }: Props) {
     <html lang="en">
       <body className={nunito.className}>
         <ClientOnly>
-          <Navbar currentUser={currentUser} />
           <ToasterProvider />
-          <RentModal />
           <LoginModal />
           <RegisterModal />
+          <RentModal />
+          <Navbar currentUser={currentUser} />
         </ClientOnly>
-        {children}
+        <div className="pb-20 pt-28">{children}</div>
       </body>
     </html>
   );
