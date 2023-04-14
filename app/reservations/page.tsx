@@ -25,5 +25,4 @@ const ReservationsPage = async () => {
     </ClientOnly>
   );
 };
-
 export default ReservationsPage;

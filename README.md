@@ -10,13 +10,13 @@ npx create-next-app airbnb-clone
 
 ### Install dependencies
 
-#### axios, date-fns, next-cloudinary, react-date-range, react-hook-form, react-hot-toast, react-icons, react-leaflet, react-select, world-countries zustand
+#### axios, date-fns, next-cloudinary, react-date-range, react-hook-form, react-hot-toast, react-icons, react-leaflet, react-select, react-spinners, world-countries zustand
 
 ```sh
-npm i axios date-fns next-cloudinary react-date-range react-hook-form react-hot-toast react-icons react-leaflet react-select world-countries zustand
+npm i axios date-fns next-cloudinary react-date-range react-hook-form react-hot-toast react-icons react-leaflet react-select react-spinners world-countries zustand
 ```
 
-#### tailwindcss, prisma,
+#### tailwindcss, prisma, types/leaflet, types/react-date-range
 
 ```sh
 npm i -D tailwindcss postcss autoprefixer prisma @types/leaflet @types/react-date-range

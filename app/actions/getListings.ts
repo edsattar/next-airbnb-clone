@@ -26,35 +26,12 @@ export default async function getListings(params: IListingsParams) {
 
     let query: any = {};
 
-    if (userId) {
-      query.userId = userId;
-    }
-
-    if (category) {
-      query.category = category;
-    }
-
-    if (roomCount) {
-      query.roomCount = {
-        gte: +roomCount,
-      };
-    }
-
-    if (guestCount) {
-      query.guestCount = {
-        gte: +guestCount,
-      };
-    }
-
-    if (bathroomCount) {
-      query.bathroomCount = {
-        gte: +bathroomCount,
-      };
-    }
-
-    if (locationValue) {
-      query.locationValue = locationValue;
-    }
+    if (userId) query.userId = userId;
+    if (category) query.category = category;
+    if (locationValue) query.locationValue = locationValue;
+    if (roomCount) query.roomCount = { gte: +roomCount };
+    if (guestCount) query.guestCount = { gte: +guestCount };
+    if (bathroomCount) query.bathroomCount = { gte: +bathroomCount };
 
     if (startDate && endDate) {
       query.NOT = {
